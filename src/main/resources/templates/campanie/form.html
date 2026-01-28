@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${mode == 'create' ? 'Adauga campanie' : 'Editeaza campanie'}"></title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="mb-4"
+        th:text="${mode == 'create' ? 'Adauga campanie' : 'Editeaza campanie'}"></h1>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- CREATE -->
+    <form th:if="${mode == 'create'}"
+          th:action="@{/campanii}"
+          th:object="${campanie}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nume campanie</label>
+            <input type="text" class="form-control" th:field="*{numeCampanie}">
+            <div class="text-danger" th:errors="*{numeCampanie}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descriere</label>
+            <textarea class="form-control" th:field="*{descriere}" rows="3"></textarea>
+            <div class="text-danger" th:errors="*{descriere}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data start</label>
+                <input type="date" class="form-control" th:field="*{dataStart}">
+                <div class="text-danger" th:errors="*{dataStart}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data final</label>
+                <input type="date" class="form-control" th:field="*{dataFinal}">
+                <div class="text-danger" th:errors="*{dataFinal}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" th:field="*{status}">
+                    <option th:each="s : ${statusuri}" th:value="${s}" th:text="${s}"></option>
+                </select>
+                <div class="text-danger" th:errors="*{status}"></div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" type="submit">Salveaza</button>
+            <a class="btn btn-secondary" th:href="@{/campanii}">Renunta</a>
+        </div>
+    </form>
+
+    <!-- EDIT -->
+    <form th:if="${mode == 'edit'}"
+          th:action="@{/campanii/{id}(id=${campanie.id})}"
+          th:object="${campanie}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nume campanie</label>
+            <input type="text" class="form-control" th:field="*{numeCampanie}">
+            <div class="text-danger" th:errors="*{numeCampanie}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descriere</label>
+            <textarea class="form-control" th:field="*{descriere}" rows="3"></textarea>
+            <div class="text-danger" th:errors="*{descriere}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data start</label>
+                <input type="date" class="form-control" th:field="*{dataStart}">
+                <div class="text-danger" th:errors="*{dataStart}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data final</label>
+                <input type="date" class="form-control" th:field="*{dataFinal}">
+                <div class="text-danger" th:errors="*{dataFinal}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" th:field="*{status}">
+                    <option th:each="s : ${statusuri}" th:value="${s}" th:text="${s}"></option>
+                </select>
+                <div class="text-danger" th:errors="*{status}"></div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Actualizeaza</button>
+            <a class="btn btn-secondary" th:href="@{/campanii}">Renunta</a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

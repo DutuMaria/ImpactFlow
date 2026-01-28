@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${mode == 'create' ? 'Adauga categorie' : 'Editeaza categorie'}"></title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="mb-4"
+        th:text="${mode == 'create' ? 'Adauga categorie' : 'Editeaza categorie'}"></h1>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- CREATE -->
+    <form th:if="${mode == 'create'}"
+          th:action="@{/categorii-voluntari}"
+          th:object="${categorieVoluntar}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nume categorie</label>
+            <select class="form-select" th:field="*{numeCategorie}">
+                <option value="" disabled selected>Alege...</option>
+                <option th:each="n : ${numeCategorii}" th:value="${n}" th:text="${n}"></option>
+            </select>
+            <div class="text-danger" th:errors="*{numeCategorie}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descriere</label>
+            <textarea class="form-control" th:field="*{descriere}" rows="3"></textarea>
+            <div class="text-danger" th:errors="*{descriere}"></div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" type="submit">Salveaza</button>
+            <a class="btn btn-secondary" th:href="@{/categorii-voluntari}">Renunta</a>
+        </div>
+    </form>
+
+    <!-- EDIT -->
+    <form th:if="${mode == 'edit'}"
+          th:action="@{/categorii-voluntari/{id}(id=${categorieVoluntar.id})}"
+          th:object="${categorieVoluntar}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nume categorie</label>
+            <select class="form-select" th:field="*{numeCategorie}">
+                <option th:each="n : ${numeCategorii}" th:value="${n}" th:text="${n}"></option>
+            </select>
+            <div class="text-danger" th:errors="*{numeCategorie}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descriere</label>
+            <textarea class="form-control" th:field="*{descriere}" rows="3"></textarea>
+            <div class="text-danger" th:errors="*{descriere}"></div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Actualizeaza</button>
+            <a class="btn btn-secondary" th:href="@{/categorii-voluntari}">Renunta</a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

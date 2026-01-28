@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${mode == 'create' ? 'Adauga proiect' : 'Editeaza proiect'}"></title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="mb-4" th:text="${mode == 'create' ? 'Adauga proiect' : 'Editeaza proiect'}"></h1>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- CREATE -->
+    <form th:if="${mode == 'create'}"
+          th:action="@{/proiecte}"
+          th:object="${proiectForm}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nume proiect</label>
+            <input type="text" class="form-control" th:field="*{numeProiect}">
+            <div class="text-danger" th:errors="*{numeProiect}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descriere</label>
+            <textarea class="form-control" th:field="*{descriere}" rows="3"></textarea>
+            <div class="text-danger" th:errors="*{descriere}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Organizatie</label>
+                <select class="form-select" th:field="*{organizatieId}">
+                    <option value="" disabled selected>Alege...</option>
+                    <option th:each="o : ${organizatii}" th:value="${o.id}" th:text="${o.numeOrganizatie}"></option>
+                </select>
+                <div class="text-danger" th:errors="*{organizatieId}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Locatie</label>
+                <select class="form-select" th:field="*{locatieId}">
+                    <option value="" disabled selected>Alege...</option>
+                    <option th:each="l : ${locatii}" th:value="${l.id}"
+                            th:text="${l.oras + ', ' + l.judet + ' - ' + l.adresa}"></option>
+                </select>
+                <div class="text-danger" th:errors="*{locatieId}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Campanie</label>
+                <select class="form-select" th:field="*{campanieId}">
+                    <option value="">— Fara campanie —</option>
+                    <option th:each="c : ${campanii}" th:value="${c.id}" th:text="${c.numeCampanie}"></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" th:field="*{status}">
+                    <option th:each="s : ${statusuri}" th:value="${s}" th:text="${s}"></option>
+                </select>
+                <div class="text-danger" th:errors="*{status}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data start</label>
+                <input type="date" class="form-control" th:field="*{dataStart}">
+                <div class="text-danger" th:errors="*{dataStart}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data final</label>
+                <input type="date" class="form-control" th:field="*{dataFinal}">
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" type="submit">Salveaza</button>
+            <a class="btn btn-secondary" th:href="@{/proiecte}">Renunta</a>
+        </div>
+    </form>
+
+    <!-- EDIT -->
+    <form th:if="${mode == 'edit'}"
+          th:action="@{/proiecte/{id}(id=${proiectForm.id})}"
+          th:object="${proiectForm}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nume proiect</label>
+            <input type="text" class="form-control" th:field="*{numeProiect}">
+            <div class="text-danger" th:errors="*{numeProiect}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descriere</label>
+            <textarea class="form-control" th:field="*{descriere}" rows="3"></textarea>
+            <div class="text-danger" th:errors="*{descriere}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Organizatie</label>
+                <select class="form-select" th:field="*{organizatieId}">
+                    <option th:each="o : ${organizatii}" th:value="${o.id}" th:text="${o.numeOrganizatie}"></option>
+                </select>
+                <div class="text-danger" th:errors="*{organizatieId}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Locatie</label>
+                <select class="form-select" th:field="*{locatieId}">
+                    <option th:each="l : ${locatii}" th:value="${l.id}"
+                            th:text="${l.oras + ', ' + l.judet + ' - ' + l.adresa}"></option>
+                </select>
+                <div class="text-danger" th:errors="*{locatieId}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Campanie</label>
+                <select class="form-select" th:field="*{campanieId}">
+                    <option value="">— Fara campanie —</option>
+                    <option th:each="c : ${campanii}" th:value="${c.id}" th:text="${c.numeCampanie}"></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" th:field="*{status}">
+                    <option th:each="s : ${statusuri}" th:value="${s}" th:text="${s}"></option>
+                </select>
+                <div class="text-danger" th:errors="*{status}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data start</label>
+                <input type="date" class="form-control" th:field="*{dataStart}">
+                <div class="text-danger" th:errors="*{dataStart}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data final</label>
+                <input type="date" class="form-control" th:field="*{dataFinal}">
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Actualizeaza</button>
+            <a class="btn btn-secondary" th:href="@{/proiecte}">Renunta</a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

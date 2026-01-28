@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Voluntari - Competente</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Voluntari - Competente</h1>
+        <a class="btn btn-primary" th:href="@{/voluntari-competente/new}">+ Atribuie competenta</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>Voluntar</th>
+            <th>Competenta</th>
+            <th>Nivel</th>
+            <th style="width:220px;">Actiuni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${asocieri}">
+            <td th:text="${a.voluntar.nume + ' ' + a.voluntar.prenume}"></td>
+            <td th:text="${a.competenta.numeCompetenta}"></td>
+            <td><span class="badge bg-secondary" th:text="${a.nivel}"></span></td>
+            <td>
+                <a class="btn btn-sm btn-warning"
+                   th:href="@{/voluntari-competente/{v}/{c}/edit(v=${a.id.voluntarId}, c=${a.id.competentaId})}">
+                    Editeaza
+                </a>
+
+                <form th:action="@{/voluntari-competente/{v}/{c}/delete(v=${a.id.voluntarId}, c=${a.id.competentaId})}"
+                      method="post" class="d-inline"
+                      onsubmit="return confirm('Sigur vrei sa stergi asocierea?');">
+                    <button class="btn btn-sm btn-danger" type="submit">Sterge</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

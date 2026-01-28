@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Editeaza participare</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="mb-4">Editeaza participare</h1>
+
+    <form th:action="@{/participari/{v}/{p}(v=${form.voluntarId}, p=${form.proiectId})}"
+          th:object="${form}" method="post" class="card p-4 shadow-sm">
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Voluntar</label>
+                <input class="form-control" type="text"
+                       th:value="${voluntar.nume + ' ' + voluntar.prenume}" disabled>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Proiect</label>
+                <input class="form-control" type="text" th:value="${proiect.numeProiect}" disabled>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 mb-3">
+                <label class="form-label">Rol</label>
+                <input class="form-control" type="text" th:field="*{rol}">
+                <div class="text-danger" th:errors="*{rol}"></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Numar ore</label>
+                <input class="form-control" type="number" step="0.01" th:field="*{numarOre}">
+                <div class="text-danger" th:errors="*{numarOre}"></div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Actualizeaza</button>
+            <a class="btn btn-secondary" th:href="@{/participari}">Renunta</a>
+        </div>
+
+    </form>
+
+</div>
+</body>
+</html>

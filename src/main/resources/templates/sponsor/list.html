@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Sponsori</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Sponsori</h1>
+        <a class="btn btn-primary" th:href="@{/sponsori/new}">+ Adauga sponsor</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nume</th>
+            <th>Tip</th>
+            <th>Email</th>
+            <th>Telefon</th>
+            <th style="width:180px;">Actiuni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${sponsori}">
+            <td th:text="${s.id}"></td>
+            <td th:text="${s.numeSponsor}"></td>
+            <td><span class="badge bg-secondary" th:text="${s.tipSponsor}"></span></td>
+            <td th:text="${s.email}"></td>
+            <td th:text="${s.telefon}"></td>
+            <td>
+                <a class="btn btn-sm btn-warning"
+                   th:href="@{/sponsori/{id}/edit(id=${s.id})}">Editeaza</a>
+
+                <form th:action="@{/sponsori/{id}/delete(id=${s.id})}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Sigur vrei sa stergi sponsorul?');">
+                    <button class="btn btn-sm btn-danger" type="submit">Sterge</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

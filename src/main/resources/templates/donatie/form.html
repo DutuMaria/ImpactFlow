@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${mode == 'create' ? 'Adauga donatie' : 'Editeaza donatie'}"></title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="mb-4" th:text="${mode == 'create' ? 'Adauga donatie' : 'Editeaza donatie'}"></h1>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- CREATE -->
+    <form th:if="${mode == 'create'}"
+          th:action="@{/donatii}"
+          th:object="${donatieForm}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Proiect</label>
+            <select class="form-select" th:field="*{proiectId}">
+                <option value="" disabled selected>Alege...</option>
+                <option th:each="p : ${proiecte}" th:value="${p.id}" th:text="${p.numeProiect}"></option>
+            </select>
+            <div class="text-danger" th:errors="*{proiectId}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data donatiei</label>
+                <input type="date" class="form-control" th:field="*{dataDonatie}">
+                <div class="text-danger" th:errors="*{dataDonatie}"></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Suma</label>
+                <input type="number" step="0.01" class="form-control" th:field="*{suma}">
+                <div class="text-danger" th:errors="*{suma}"></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Donator</label>
+                <input type="text" class="form-control" th:field="*{donator}" placeholder="Optional">
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" type="submit">Salveaza</button>
+            <a class="btn btn-secondary" th:href="@{/donatii}">Renunta</a>
+        </div>
+    </form>
+
+    <!-- EDIT -->
+    <form th:if="${mode == 'edit'}"
+          th:action="@{/donatii/{id}(id=${donatieForm.id})}"
+          th:object="${donatieForm}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Proiect</label>
+            <select class="form-select" th:field="*{proiectId}">
+                <option th:each="p : ${proiecte}" th:value="${p.id}" th:text="${p.numeProiect}"></option>
+            </select>
+            <div class="text-danger" th:errors="*{proiectId}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Data donatiei</label>
+                <input type="date" class="form-control" th:field="*{dataDonatie}">
+                <div class="text-danger" th:errors="*{dataDonatie}"></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Suma</label>
+                <input type="number" step="0.01" class="form-control" th:field="*{suma}">
+                <div class="text-danger" th:errors="*{suma}"></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Donator</label>
+                <input type="text" class="form-control" th:field="*{donator}" placeholder="Optional">
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Actualizeaza</button>
+            <a class="btn btn-secondary" th:href="@{/donatii}">Renunta</a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

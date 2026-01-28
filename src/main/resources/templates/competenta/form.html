@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${mode == 'create' ? 'Adauga competenta' : 'Editeaza competenta'}"></title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="mb-4"
+        th:text="${mode == 'create' ? 'Adauga competenta' : 'Editeaza competenta'}"></h1>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- CREATE -->
+    <form th:if="${mode == 'create'}"
+          th:action="@{/competente}"
+          th:object="${competenta}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nume competenta</label>
+            <input type="text" class="form-control" th:field="*{numeCompetenta}">
+            <div class="text-danger" th:errors="*{numeCompetenta}"></div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" type="submit">Salveaza</button>
+            <a class="btn btn-secondary" th:href="@{/competente}">Renunta</a>
+        </div>
+    </form>
+
+    <!-- EDIT -->
+    <form th:if="${mode == 'edit'}"
+          th:action="@{/competente/{id}(id=${competenta.id})}"
+          th:object="${competenta}"
+          method="post"
+          class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nume competenta</label>
+            <input type="text" class="form-control" th:field="*{numeCompetenta}">
+            <div class="text-danger" th:errors="*{numeCompetenta}"></div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Actualizeaza</button>
+            <a class="btn btn-secondary" th:href="@{/competente}">Renunta</a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Editeaza nivel competenta</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="mb-4">Editeaza nivel competenta</h1>
+
+    <form th:action="@{/voluntari-competente/{v}/{c}(v=${form.voluntarId}, c=${form.competentaId})}"
+          th:object="${form}" method="post" class="card p-4 shadow-sm">
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Voluntar</label>
+                <input class="form-control" type="text"
+                       th:value="${voluntar.nume + ' ' + voluntar.prenume}" disabled>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Competenta</label>
+                <input class="form-control" type="text"
+                       th:value="${competenta.numeCompetenta}" disabled>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nivel</label>
+            <select class="form-select" th:field="*{nivel}">
+                <option th:each="n : ${niveluri}" th:value="${n}" th:text="${n}"></option>
+            </select>
+            <div class="text-danger" th:errors="*{nivel}"></div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Actualizeaza</button>
+            <a class="btn btn-secondary" th:href="@{/voluntari-competente}">Renunta</a>
+        </div>
+
+    </form>
+
+</div>
+</body>
+</html>

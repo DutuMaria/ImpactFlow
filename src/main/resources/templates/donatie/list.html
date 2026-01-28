@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Donatii</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Donatii</h1>
+        <a class="btn btn-primary" th:href="@{/donatii/new}">+ Adauga donatie</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Proiect</th>
+            <th>Data</th>
+            <th>Donator</th>
+            <th>Suma</th>
+            <th style="width:180px;">Actiuni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="d : ${donatii}">
+            <td th:text="${d.id}"></td>
+            <td th:text="${d.proiect.numeProiect}"></td>
+            <td th:text="${d.dataDonatie}"></td>
+            <td th:text="${d.donator != null ? d.donator : '-'}"></td>
+            <td th:text="${d.suma}"></td>
+            <td>
+                <a class="btn btn-sm btn-warning"
+                   th:href="@{/donatii/{id}/edit(id=${d.id})}">Editeaza</a>
+
+                <form th:action="@{/donatii/{id}/delete(id=${d.id})}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Sigur vrei sa stergi donatia?');">
+                    <button class="btn btn-sm btn-danger" type="submit">Sterge</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

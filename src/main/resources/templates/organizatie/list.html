@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Organizatii</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Organizatii</h1>
+        <a class="btn btn-primary" th:href="@{/organizatii/new}">+ Adauga organizatie</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nume</th>
+            <th>Email</th>
+            <th>Telefon</th>
+            <th>Website</th>
+            <th style="width:180px;">Actiuni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="o : ${organizatii}">
+            <td th:text="${o.id}"></td>
+            <td th:text="${o.numeOrganizatie}"></td>
+            <td th:text="${o.email}"></td>
+            <td th:text="${o.telefon}"></td>
+            <td th:text="${o.website}"></td>
+            <td>
+                <a class="btn btn-sm btn-warning"
+                   th:href="@{/organizatii/{id}/edit(id=${o.id})}">Editeaza</a>
+
+                <form th:action="@{/organizatii/{id}/delete(id=${o.id})}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Sigur vrei sa stergi organizatia?');">
+                    <button class="btn btn-sm btn-danger" type="submit">Sterge</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

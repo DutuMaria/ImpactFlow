@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Participari</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Participari voluntari - proiecte</h1>
+        <a class="btn btn-primary" th:href="@{/participari/new}">+ Adauga participare</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>Voluntar</th>
+            <th>Proiect</th>
+            <th>Rol</th>
+            <th>Ore</th>
+            <th style="width:220px;">Actiuni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${participari}">
+            <td th:text="${p.voluntar.nume + ' ' + p.voluntar.prenume}"></td>
+            <td th:text="${p.proiect.numeProiect}"></td>
+            <td th:text="${p.rol}"></td>
+            <td th:text="${p.numarOre}"></td>
+            <td>
+                <a class="btn btn-sm btn-warning"
+                   th:href="@{/participari/{v}/{pr}/edit(v=${p.id.voluntarId}, pr=${p.id.proiectId})}">
+                    Editeaza
+                </a>
+
+                <form th:action="@{/participari/{v}/{pr}/delete(v=${p.id.voluntarId}, pr=${p.id.proiectId})}"
+                      method="post" class="d-inline"
+                      onsubmit="return confirm('Sigur vrei sa stergi participarea?');">
+                    <button class="btn btn-sm btn-danger" type="submit">Sterge</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

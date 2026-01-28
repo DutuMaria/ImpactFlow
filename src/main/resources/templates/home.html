@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Voluntariat – Home</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!-- INTRO -->
+    <div class="mb-5">
+        <h1 class="fw-bold">Platforma de management voluntariat</h1>
+        <p class="text-muted fs-5">
+            Aceasta aplicatie permite gestionarea completa a activitatilor de voluntariat:
+            voluntari, proiecte, organizatii, donatii, sponsori si competente,
+            precum si relatiile dintre acestea.
+        </p>
+    </div>
+
+    <!-- GRID LINKURI -->
+    <div class="row g-4">
+
+        <!-- DATE DE BAZA -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Date de baza</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li><a th:href="@{/locatii}">Locatii</a></li>
+                        <li><a th:href="@{/organizatii}">Organizatii</a></li>
+                        <li><a th:href="@{/campanii}">Campanii</a></li>
+                        <li><a th:href="@{/sponsori}">Sponsori</a></li>
+                        <li><a th:href="@{/competente}">Competente</a></li>
+                        <li><a th:href="@{/categorii-voluntari}">Categorii voluntari</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPERATIONAL -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Operational</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li><a th:href="@{/voluntari}">Voluntari</a></li>
+                        <li><a th:href="@{/proiecte}">Proiecte</a></li>
+                        <li><a th:href="@{/donatii}">Donatii</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ASOCIERI -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Asocieri</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li><a th:href="@{/participari}">Participari voluntari–proiecte</a></li>
+                        <li><a th:href="@{/voluntari-competente}">Voluntari–competente</a></li>
+                        <li><a th:href="@{/proiecte-sponsori}">Proiecte–sponsori</a></li>
+                        <li><a th:href="@{/proiecte-competente}">Proiecte–competente</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

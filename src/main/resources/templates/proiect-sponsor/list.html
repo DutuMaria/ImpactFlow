@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Proiecte - Sponsori</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Proiecte - Sponsori</h1>
+        <a class="btn btn-primary" th:href="@{/proiecte-sponsori/new}">+ Asociaza sponsor</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>Proiect</th>
+            <th>Sponsor</th>
+            <th>Tip sponsor</th>
+            <th style="width:180px;">Actiuni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${asocieri}">
+            <td th:text="${a.proiect.numeProiect}"></td>
+            <td th:text="${a.sponsor.numeSponsor}"></td>
+            <td><span class="badge bg-secondary" th:text="${a.sponsor.tipSponsor}"></span></td>
+            <td>
+                <form th:action="@{/proiecte-sponsori/{p}/{s}/delete(p=${a.id.proiectId}, s=${a.id.sponsorId})}"
+                      method="post" class="d-inline"
+                      onsubmit="return confirm('stergi asocierea proiect-sponsor?');">
+                    <button class="btn btn-sm btn-danger" type="submit">Sterge</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>
