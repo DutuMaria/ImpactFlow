@@ -1,0 +1,131 @@
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Jan 25 17:38:36 2026
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Enter user-name: sys as sysdba
+Enter password:
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> select user, database_name from dual;
+
+USER
+--------------------------------------------------------------------------------
+DATABASE_NAME
+--------------------------------------------------------------------------------
+SYS
+VOLUNTEE
+
+
+SQL> CREATE USER VOL_OLTP IDENTIFIED BY "envVarPassword"   DEFAULT TABLESPACE USERS
+  2    TEMPORARY TABLESPACE TEMP
+  3    QUOTA UNLIMITED ON USERS;
+
+User created.
+
+SQL>
+SQL> GRANT CREATE SESSION, CREATE TABLE, CREATE VIEW, CREATE SEQUENCE, CREATE PROCEDURE, CREATE TRIGGER
+  2  TO VOL_OLTP;
+
+Grant succeeded.
+
+SQL> SHOW USER;
+USER is "SYS"
+SQL> SHOW CON_NAME;
+
+CON_NAME
+------------------------------
+voluntee
+SQL> SHOW CON_NAME;
+
+CON_NAME
+------------------------------
+voluntee
+SQL>
+SQL>
+SQL>
+
+SQL> SHOW CON_NAME;
+
+CON_NAME
+------------------------------
+voluntee
+SQL> CREATE USER VOL_DW IDENTIFIED BY "envVarPassword"
+  2    DEFAULT TABLESPACE USERS
+  3    TEMPORARY TABLESPACE TEMP
+  4    QUOTA UNLIMITED ON USERS;
+
+User created.
+
+SQL>
+SQL> GRANT CREATE SESSION, CREATE TABLE, CREATE VIEW, CREATE SEQUENCE,
+  2        CREATE PROCEDURE, CREATE TRIGGER
+  3  TO VOL_DW;
+
+Grant succeeded.
+
+SQL> CREATE USER VOL_ETL IDENTIFIED BY "envVarPassword"
+  2    DEFAULT TABLESPACE USERS
+  3    TEMPORARY TABLESPACE TEMP
+  4    QUOTA UNLIMITED ON USERS;
+
+User created.
+
+SQL>
+SQL> GRANT CREATE SESSION TO VOL_ETL;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON VOL_OLTP.DONATIE     TO VOL_ETL;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON VOL_OLTP.PROIECT     TO VOL_ETL;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON VOL_OLTP.CAMPANIE    TO VOL_ETL;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON VOL_OLTP.ORGANIZATIE TO VOL_ETL;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON VOL_OLTP.LOCATIE     TO VOL_ETL;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, UPDATE, DELETE ON vol_dw.dim_timp       TO vol_etl;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, UPDATE, DELETE ON vol_dw.dim_proiect    TO vol_etl;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, UPDATE, DELETE ON vol_dw.dim_locatie    TO vol_etl;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, UPDATE, DELETE ON vol_dw.dim_organizatie TO vol_etl;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, UPDATE, DELETE ON vol_dw.dim_campanie   TO vol_etl;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, UPDATE, DELETE ON vol_dw.fapte_donatii  TO vol_etl;
+
+Grant succeeded.
+
+SQL> GRANT CREATE DIMENSION TO vol_dw;
+
+Grant succeeded.
+
+SQL>

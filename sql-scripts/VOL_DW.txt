@@ -1,0 +1,307 @@
+--3
+CREATE TABLE dim_timp (
+  id_timp   NUMBER(8)   NOT NULL,
+  an        NUMBER(4)   NOT NULL,
+  luna      NUMBER(2)   NOT NULL,
+  trimestru NUMBER(1)   NOT NULL,
+
+  CONSTRAINT pk_dim_timp PRIMARY KEY (id_timp),
+  CONSTRAINT ck_dim_timp_luna CHECK (luna BETWEEN 1 AND 12),
+  CONSTRAINT ck_dim_timp_trimestru CHECK (trimestru BETWEEN 1 AND 4)
+);
+
+CREATE TABLE dim_proiect (
+  id_proiect   NUMBER NOT NULL,
+  nume_proiect VARCHAR2(150) NOT NULL,
+  status       VARCHAR2(30) NOT NULL,
+
+  CONSTRAINT pk_dim_proiect PRIMARY KEY (id_proiect),
+  CONSTRAINT ck_dim_proiect_status
+    CHECK (status IN ('IN_DESFASURARE','FINALIZAT','ANULAT'))
+);
+
+CREATE TABLE dim_campanie (
+  id_campanie   NUMBER NOT NULL,
+  nume_campanie VARCHAR2(150) NOT NULL,
+  status_campanie VARCHAR2(30) NOT NULL,
+
+  CONSTRAINT pk_dim_campanie PRIMARY KEY (id_campanie),
+  CONSTRAINT ck_dim_campanie_status
+    CHECK (status_campanie IN ('PLANIFICATA','ACTIVA','INCHISA','ANULATA'))
+);
+
+CREATE TABLE dim_organizatie (
+  id_organizatie   NUMBER NOT NULL,
+  nume_organizatie VARCHAR2(150) NOT NULL,
+  email            VARCHAR2(150),
+
+  CONSTRAINT pk_dim_organizatie PRIMARY KEY (id_organizatie)
+);
+
+CREATE TABLE dim_locatie (
+  id_locatie NUMBER NOT NULL,
+  oras       VARCHAR2(100) NOT NULL,
+  judet      VARCHAR2(100) NOT NULL,
+
+  CONSTRAINT pk_dim_locatie PRIMARY KEY (id_locatie)
+);
+
+CREATE TABLE fapte_donatii (
+  id_timp        NUMBER NOT NULL,
+  id_proiect     NUMBER NOT NULL,
+  id_locatie     NUMBER NOT NULL,
+  id_organizatie NUMBER NOT NULL,
+  id_campanie    NUMBER NOT NULL,
+  suma_totala    NUMBER(12,2) NOT NULL,
+
+  CONSTRAINT pk_fapte_donatii PRIMARY KEY (id_timp, id_proiect, id_locatie, id_organizatie, id_campanie),
+
+  CONSTRAINT fk_fd_timp FOREIGN KEY (id_timp) REFERENCES dim_timp(id_timp),
+
+  CONSTRAINT fk_fd_proiect FOREIGN KEY (id_proiect) REFERENCES dim_proiect(id_proiect),
+
+  CONSTRAINT fk_fd_locatie FOREIGN KEY (id_locatie) REFERENCES dim_locatie(id_locatie),
+
+  CONSTRAINT fk_fd_organizatie FOREIGN KEY (id_organizatie) REFERENCES dim_organizatie(id_organizatie),
+
+  CONSTRAINT fk_fd_campanie FOREIGN KEY (id_campanie) REFERENCES dim_campanie(id_campanie),
+
+  CONSTRAINT ck_fd_suma CHECK (suma_totala > 0)
+);
+
+---5
+ALTER TABLE fapte_donatii
+  MODIFY CONSTRAINT fk_fd_campanie RELY NOVALIDATE;
+  
+ALTER TABLE fapte_donatii
+  MODIFY CONSTRAINT fk_fd_timp RELY NOVALIDATE;
+  
+SELECT constraint_name, status, validated, rely
+FROM user_constraints
+WHERE table_name = 'FAPTE_DONATII'
+AND constraint_name = 'FK_FD_CAMPANIE';
+
+--6
+CREATE BITMAP INDEX bix_dim_proiect_status
+ON dim_proiect (status);
+
+CREATE BITMAP INDEX bix_dim_locatie_judet
+ON dim_locatie (judet);
+
+SELECT SUM(fd.suma_totala) AS suma_totala
+FROM fapte_donatii fd
+JOIN dim_proiect dp ON dp.id_proiect = fd.id_proiect
+JOIN dim_locatie dl ON dl.id_locatie = fd.id_locatie
+WHERE dp.status = 'FINALIZAT'
+  AND dl.judet = 'Bucuresti';
+  
+EXPLAIN PLAN FOR
+SELECT SUM(fd.suma_totala)
+FROM fapte_donatii fd
+JOIN dim_proiect dp ON dp.id_proiect = fd.id_proiect
+JOIN dim_locatie dl ON dl.id_locatie = fd.id_locatie
+WHERE dp.status = 'FINALIZAT'
+  AND dl.judet = 'Bucuresti';
+  
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+--7
+CREATE DIMENSION dim_timp_dim
+  LEVEL zi        IS (dim_timp.id_timp)
+  LEVEL luna      IS (dim_timp.luna)
+  LEVEL trimestru IS (dim_timp.trimestru)
+  LEVEL an        IS (dim_timp.an)
+
+  HIERARCHY timp_hier
+    (zi CHILD OF luna
+     CHILD OF trimestru
+     CHILD OF an);
+
+BEGIN
+  DBMS_DIMENSION.VALIDATE_DIMENSION(
+    dimension    => 'DIM_TIMP_DIM',
+    incremental  => FALSE,
+    check_nulls  => TRUE,
+    statement_id => 'VAL_DIM_TIMP_01'
+  );
+END;
+/
+
+CREATE DIMENSION dim_locatie_dim
+  LEVEL oras  IS (dim_locatie.oras)
+  LEVEL judet IS (dim_locatie.judet)
+
+  HIERARCHY locatie_hier
+    (oras CHILD OF judet);
+    
+BEGIN
+  DBMS_DIMENSION.VALIDATE_DIMENSION(
+    dimension    => 'DIM_LOCATIE_DIM',
+    incremental  => FALSE,
+    check_nulls  => TRUE,
+    statement_id => 'VAL_DIM_LOCATIE_01'
+  );
+END;
+/
+
+--8
+
+CREATE TABLE fapte_donatii_p (
+  id_timp       NUMBER NOT NULL,
+  id_proiect    NUMBER NOT NULL,
+  id_locatie    NUMBER NOT NULL,
+  id_organizatie NUMBER NOT NULL,
+  id_campanie   NUMBER,
+  suma_totala   NUMBER(12,2) NOT NULL,
+  CONSTRAINT pk_fapte_donatii_p PRIMARY KEY (id_timp, id_proiect, id_locatie, id_organizatie),
+  CONSTRAINT fk_fd_timp_p FOREIGN KEY (id_timp) REFERENCES dim_timp(id_timp),
+  CONSTRAINT fk_fd_proiect_p FOREIGN KEY (id_proiect) REFERENCES dim_proiect(id_proiect),
+  CONSTRAINT fk_fd_locatie_p FOREIGN KEY (id_locatie) REFERENCES dim_locatie(id_locatie),
+  CONSTRAINT fk_fd_org_p FOREIGN KEY (id_organizatie) REFERENCES dim_organizatie(id_organizatie),
+  CONSTRAINT fk_fd_camp_p FOREIGN KEY (id_campanie) REFERENCES dim_campanie(id_campanie)
+)
+PARTITION BY RANGE (id_timp) (
+  PARTITION p2023 VALUES LESS THAN (20240101),
+  PARTITION p2024 VALUES LESS THAN (20250101),
+  PARTITION p2025 VALUES LESS THAN (20260101),
+  PARTITION pmax  VALUES LESS THAN (MAXVALUE)
+);
+
+
+INSERT /*+ APPEND */ INTO fapte_donatii_p
+SELECT * FROM fapte_donatii;
+
+COMMIT;
+
+ALTER TABLE fapte_donatii RENAME TO fapte_donatii_old;
+ALTER TABLE fapte_donatii_p RENAME TO fapte_donatii;
+
+
+EXPLAIN PLAN FOR
+SELECT SUM(suma_totala) suma_2025
+FROM fapte_donatii
+WHERE id_timp BETWEEN 20250101 AND 20251231;
+
+SELECT * 
+FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, NULL, 'BASIC +PARTITION'));
+
+
+
+CREATE TABLE dim_proiect_p (
+  id_proiect   NUMBER NOT NULL,
+  nume_proiect VARCHAR2(150) NOT NULL,
+  status       VARCHAR2(30)  NOT NULL,
+  CONSTRAINT pk_dim_proiect_p PRIMARY KEY (id_proiect),
+  CONSTRAINT ck_dim_proiect_status_p CHECK (status IN ('IN_DESFASURARE','FINALIZAT','ANULAT'))
+)
+PARTITION BY LIST (status) (
+  PARTITION p_activ     VALUES ('IN_DESFASURARE'),
+  PARTITION p_finalizat VALUES ('FINALIZAT'),
+  PARTITION p_anulat    VALUES ('ANULAT'),
+  PARTITION p_other     VALUES (DEFAULT)
+);
+
+INSERT /*+ APPEND */ INTO dim_proiect_p
+SELECT * FROM dim_proiect;
+
+COMMIT;
+
+ALTER TABLE dim_proiect RENAME TO dim_proiect_old;
+ALTER TABLE dim_proiect_p RENAME TO dim_proiect;
+
+
+EXPLAIN PLAN FOR
+SELECT c.nume_campanie,
+       SUM(f.suma_totala) suma
+FROM fapte_donatii f
+JOIN dim_proiect p   ON p.id_proiect = f.id_proiect
+JOIN dim_campanie c  ON c.id_campanie = f.id_campanie
+WHERE p.status = 'IN_DESFASURARE'
+GROUP BY c.nume_campanie;
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, NULL, 'BASIC +PARTITION'));
+
+--10
+
+-- total donatii pe luna in 2025
+SELECT
+  t.an,
+  t.luna,
+  SUM(fd.suma_totala) AS suma_donatii
+FROM vol_dw.fapte_donatii fd
+JOIN vol_dw.dim_timp t
+  ON t.id_timp = fd.id_timp
+WHERE t.an = 2025
+GROUP BY t.an, t.luna
+ORDER BY t.an, t.luna;
+
+-- donatii pe campanie si judet (suma + numar donatii)
+SELECT
+  c.nume_campanie,
+  l.judet,
+  COUNT(*) AS nr_donatii,
+  SUM(fd.suma_totala) AS suma_donatii
+FROM vol_dw.fapte_donatii fd
+JOIN vol_dw.dim_campanie c
+  ON c.id_campanie = fd.id_campanie
+JOIN vol_dw.dim_locatie l
+  ON l.id_locatie = fd.id_locatie
+GROUP BY c.nume_campanie, l.judet
+ORDER BY c.nume_campanie, l.judet;
+
+
+--evolutie lunara pe proiect si status proiect
+SELECT
+  p.nume_proiect,
+  p.status AS status_proiect,
+  t.an,
+  t.luna,
+  SUM(fd.suma_totala) AS suma_donatii
+FROM vol_dw.fapte_donatii fd
+JOIN vol_dw.dim_proiect p
+  ON p.id_proiect = fd.id_proiect
+JOIN vol_dw.dim_timp t
+  ON t.id_timp = fd.id_timp
+GROUP BY p.nume_proiect, p.status, t.an, t.luna
+ORDER BY p.nume_proiect, t.an, t.luna, p.status;
+
+
+
+-- top 5 organizatii pe trimestru in 2025
+SELECT *
+FROM (
+  SELECT
+    t.trimestru,
+    o.nume_organizatie,
+    SUM(fd.suma_totala) AS suma_donatii,
+    DENSE_RANK() OVER (
+      PARTITION BY t.trimestru
+      ORDER BY SUM(fd.suma_totala) DESC
+    ) AS rnk
+  FROM vol_dw.fapte_donatii fd
+  JOIN vol_dw.dim_timp t
+    ON t.id_timp = fd.id_timp
+  JOIN vol_dw.dim_organizatie o
+    ON o.id_organizatie = fd.id_organizatie
+  WHERE t.an = 2025
+  GROUP BY t.trimestru, o.nume_organizatie
+)
+WHERE rnk <= 5
+ORDER BY trimestru, rnk, suma_donatii DESC;
+
+
+-- comparatie donatii pe judet si status campanie (SUM + AVG)
+SELECT
+  l.judet,
+  c.status_campanie,
+  COUNT(*) AS nr_donatii,
+  SUM(fd.suma_totala) AS suma_donatii,
+  AVG(fd.suma_totala) AS medie_donatie
+FROM vol_dw.fapte_donatii fd
+JOIN vol_dw.dim_locatie l
+  ON l.id_locatie = fd.id_locatie
+JOIN vol_dw.dim_campanie c
+  ON c.id_campanie = fd.id_campanie
+GROUP BY l.judet, c.status_campanie
+ORDER BY l.judet, c.status_campanie;
+

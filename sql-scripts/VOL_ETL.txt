@@ -1,0 +1,58 @@
+--4
+INSERT INTO vol_dw.dim_campanie (id_campanie, nume_campanie, status_campanie)
+SELECT c.id_campanie, c.nume_campanie, c.status
+FROM vol_oltp.campanie c;
+
+COMMIT;
+
+INSERT INTO vol_dw.dim_organizatie (id_organizatie, nume_organizatie, email)
+SELECT o.id_organizatie, o.nume_organizatie, o.email
+FROM vol_oltp.organizatie o;
+
+COMMIT;
+
+INSERT INTO vol_dw.dim_locatie (id_locatie, oras, judet)
+SELECT l.id_locatie, l.oras, l.judet
+FROM vol_oltp.locatie l;
+
+COMMIT;
+
+INSERT INTO vol_dw.dim_proiect (id_proiect, nume_proiect, status)
+SELECT p.id_proiect, p.nume_proiect, p.status
+FROM vol_oltp.proiect p;
+
+COMMIT;
+
+INSERT INTO vol_dw.dim_timp (id_timp, an, luna, trimestru)
+SELECT
+  TO_NUMBER(TO_CHAR(d.data_donatie, 'YYYYMMDD')) AS id_timp,
+  EXTRACT(YEAR FROM d.data_donatie)              AS an,
+  EXTRACT(MONTH FROM d.data_donatie)             AS luna,
+  TO_NUMBER(TO_CHAR(d.data_donatie, 'Q'))        AS trimestru
+FROM (
+  SELECT DISTINCT TRUNC(data_donatie) AS data_donatie
+  FROM vol_oltp.donatie
+) d;
+
+COMMIT;
+
+INSERT INTO vol_dw.fapte_donatii
+  (id_timp, id_proiect, id_locatie, id_organizatie, id_campanie, suma_totala)
+SELECT
+  TO_NUMBER(TO_CHAR(TRUNC(d.data_donatie), 'YYYYMMDD')) AS id_timp,
+  p.id_proiect,
+  p.id_locatie,
+  p.id_organizatie,
+  p.id_campanie,
+  SUM(d.suma) AS suma_totala
+FROM vol_oltp.donatie d
+JOIN vol_oltp.proiect p
+  ON p.id_proiect = d.id_proiect
+GROUP BY
+  TO_NUMBER(TO_CHAR(TRUNC(d.data_donatie), 'YYYYMMDD')),
+  p.id_proiect,
+  p.id_locatie,
+  p.id_organizatie,
+  p.id_campanie;
+
+COMMIT;
