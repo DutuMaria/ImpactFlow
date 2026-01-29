@@ -9,13 +9,33 @@
 
 ---
 
+##  Locatii - check not null
+![Locatii2](screenshots/adauga_locatie_check_not_null.png)
+
+---
+
+##  Editare locatie
+![Locatii3](screenshots/editare_locatie.png)
+
+---
+
 ##  Organizatii
 ![Organizatii](screenshots/organizatii.png)
 
 ---
 
+##  Adaugare organizatie - validare email
+![Organizatii](screenshots/adauga_organizatie_validare.png)
+
+---
+
 ##  Campanii
 ![Campanii](screenshots/campanii.png)
+
+---
+
+##  Adaugare campanie - validare data
+![Campanii](screenshots/adauga_campanie_validare_data.png)
 
 ---
 
@@ -71,6 +91,11 @@
 
 ##  Proiecte - Sponsori
 ![ProiecteSponsori](screenshots/proiecte_sponsori.png)
+
+---
+
+##  Asociere proiect - sponsor
+![ProiecteSponsori](screenshots/asociere_sponsor_proiect.png)
 
 ---
 
