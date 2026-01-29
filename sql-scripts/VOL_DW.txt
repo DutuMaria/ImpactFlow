@@ -305,3 +305,63 @@ JOIN vol_dw.dim_campanie c
 GROUP BY l.judet, c.status_campanie
 ORDER BY l.judet, c.status_campanie;
 
+
+-- 9
+
+EXPLAIN PLAN FOR
+SELECT
+  c.nume_campanie,
+  l.judet,
+  SUM(fd.suma_totala) AS suma_donatii,
+  COUNT(*)            AS nr_donatii
+FROM fapte_donatii fd
+JOIN dim_timp t     ON t.id_timp = fd.id_timp
+JOIN dim_proiect p  ON p.id_proiect = fd.id_proiect
+JOIN dim_campanie c ON c.id_campanie = fd.id_campanie
+JOIN dim_locatie l  ON l.id_locatie = fd.id_locatie
+WHERE t.an = 2025
+  AND p.status = 'IN_DESFASURARE'
+GROUP BY c.nume_campanie, l.judet
+ORDER BY suma_donatii DESC;
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, NULL, 'BASIC +PREDICATE +NOTE +PARTITION'));
+
+-- b
+-- actualizeaza statisticile, astfel incat optimizatorul sa aleaga cel mai bun plan
+BEGIN
+  DBMS_STATS.GATHER_TABLE_STATS(user, 'FAPTE_DONATII', cascade => TRUE);
+  DBMS_STATS.GATHER_TABLE_STATS(user, 'DIM_TIMP', cascade => TRUE);
+  DBMS_STATS.GATHER_TABLE_STATS(user, 'DIM_PROIECT', cascade => TRUE);
+  DBMS_STATS.GATHER_TABLE_STATS(user, 'DIM_CAMPANIE', cascade => TRUE);
+  DBMS_STATS.GATHER_TABLE_STATS(user, 'DIM_LOCATIE', cascade => TRUE);
+END;
+/
+
+EXPLAIN PLAN FOR
+SELECT
+  c.nume_campanie,
+  l.judet,
+  SUM(fd.suma_totala) AS suma_donatii,
+  COUNT(*)            AS nr_donatii
+FROM
+  (SELECT id_proiect
+   FROM dim_proiect
+   WHERE status = 'IN_DESFASURARE') p
+JOIN fapte_donatii fd
+  ON fd.id_proiect = p.id_proiect
+JOIN
+  (SELECT id_timp
+   FROM dim_timp
+   WHERE an = 2025) t
+  ON t.id_timp = fd.id_timp
+JOIN dim_campanie c
+  ON c.id_campanie = fd.id_campanie
+JOIN dim_locatie l
+  ON l.id_locatie = fd.id_locatie
+GROUP BY c.nume_campanie, l.judet
+ORDER BY suma_donatii DESC;
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, NULL, 'BASIC +PREDICATE +NOTE +PARTITION'));
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
